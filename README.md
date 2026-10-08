@@ -27,7 +27,7 @@ Each run makes a fresh draw and fresh codes. Replacing the data invalidates all 
 
 ## Host on GitHub Pages
 
-In the repository, open **Settings → Pages** and set **Build and deployment** to **GitHub Actions**. The included workflow publishes every push to `main`. The site will be at `https://dvidianjh-cyber.github.io/SecretSanta/`.
+The repository publishes from branch **main**, folder **/ (root)**. Each push to `main` updates the site at `https://dvidianjh-cyber.github.io/SecretSanta/`. If Pages is ever disabled, restore that source in **Settings → Pages**.
 
 ## Privacy limit
 
