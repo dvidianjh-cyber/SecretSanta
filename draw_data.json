@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "demo": true,
+  "lookupSalt": "fjy14rsWIfGchsVY+8FSHQ==",
+  "all_participants": [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "David",
+    "Eve"
+  ],
+  "assignments": [
+    {
+      "name": "Alice",
+      "codeTag": "30189cca9c95afe275267139a15fa5305ae7a1d1a37e6a5893bcb0e490cb7dca",
+      "salt": "3EsihXpi+s/VjdwpxjkJ1A==",
+      "iv": "XAGmI6YsGtKUx09P",
+      "encryptedRecipient": "FFjIcsZwQDG2AUXp4BaNEbIVnOqD"
+    },
+    {
+      "name": "Bob",
+      "codeTag": "5be7d51ed7f645495644a7296acd4052584a446705eca6ae03df29c56120a7e0",
+      "salt": "GGTt6yU/khyIQcRjGR8Kqw==",
+      "iv": "1FEkgLViwjJXvFC6",
+      "encryptedRecipient": "Dz0qDyANjaaInaHdHEgOwIfGTA=="
+    },
+    {
+      "name": "Charlie",
+      "codeTag": "d3900673677ce977ad8895d616fb836e2fdea1d03ee0e0f395d4fc36720abcd9",
+      "salt": "zjcUgZ9tZuWHL6kmEH8Kxg==",
+      "iv": "qdo9mNc8wkB4Jdyd",
+      "encryptedRecipient": "mCbaL7RzERtMi3EbN8cANISlbk1n"
+    },
+    {
+      "name": "David",
+      "codeTag": "68162ced8da13160990fcd413b7fa47688c1cd648af722683688023ba2e23fe4",
+      "salt": "xOwYUWMABZ+M9Lc8iRjfdA==",
+      "iv": "ohS+9+2wnzbm0qcy",
+      "encryptedRecipient": "2hogZl8PKRy/6cSUF+MhPoMQfy7FWjI="
+    },
+    {
+      "name": "Eve",
+      "codeTag": "f5ead19266a414cf885ae63ca0602a682b6b05b6bcd834e5e106944e561ac273",
+      "salt": "CZ2ivSKp/LMCaQUb2YXPTQ==",
+      "iv": "QtYwGtmXcP/8MPNd",
+      "encryptedRecipient": "piY27jL3EkBE+6KUdkeslTNAmQ=="
+    }
+  ]
+}

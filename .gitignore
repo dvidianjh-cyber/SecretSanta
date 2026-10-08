@@ -1,0 +1,4 @@
+node_modules/
+participants.json
+join_codes*
+.DS_Store
