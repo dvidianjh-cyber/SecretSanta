@@ -120,7 +120,7 @@ async function main() {
   console.log(`Wrote ${output}\n`);
   console.log('PRIVATE JOIN CODES — send each person only their own code:');
   names.forEach((name, i) => console.log(`${name}: ${codes[i]}`));
-  console.log('\nSave these codes privately now. They cannot be recovered from the generator output.');
+  console.log('\nSave these codes privately now. The script does not write a code list to disk.');
 }
 
 main().catch(error => { console.error(error.message); process.exitCode = 1; });
