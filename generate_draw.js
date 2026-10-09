@@ -26,12 +26,17 @@ function options(argv) {
   return result;
 }
 
-function getNames(opts) {
-  const names = opts.demo
+function getDrawConfig(opts) {
+  const input = opts.demo
     ? ['Alice', 'Bob', 'Charlie', 'David', 'Eve']
     : opts.file
       ? JSON.parse(fs.readFileSync(path.resolve(opts.file), 'utf8'))
       : opts.names.split(',');
+  const config = Array.isArray(input) ? { participants: input } : input;
+  if (!config || typeof config !== 'object') {
+    throw new Error('Participant file must contain an array or a configuration object.');
+  }
+  const { participants: names, disallowedPairings = [], disallowedRecipients = {} } = config;
   if (!Array.isArray(names)) throw new Error('Participant file must contain a JSON array of names.');
   const clean = names.map(name => typeof name === 'string' ? name.trim() : '');
   if (clean.length < 2 || clean.length > 100) throw new Error('Provide between 2 and 100 participants.');
@@ -39,19 +44,67 @@ function getNames(opts) {
   if (new Set(clean.map(name => name.toLocaleLowerCase())).size !== clean.length) {
     throw new Error('Participant names must be unique (ignoring case).');
   }
-  return clean;
+  if (!Array.isArray(disallowedPairings)) throw new Error('disallowedPairings must be an array of two-name arrays.');
+  if (!disallowedRecipients || typeof disallowedRecipients !== 'object' || Array.isArray(disallowedRecipients)) {
+    throw new Error('disallowedRecipients must be an object mapping giver names to recipient arrays.');
+  }
+
+  const byName = new Map(clean.map((name, i) => [name.toLocaleLowerCase(), i]));
+  const indexFor = name => {
+    const index = typeof name === 'string' ? byName.get(name.trim().toLocaleLowerCase()) : undefined;
+    if (index === undefined) throw new Error(`Unknown participant in exclusions: ${JSON.stringify(name)}.`);
+    return index;
+  };
+  const blocked = clean.map((_, i) => new Set([i]));
+  for (const pair of disallowedPairings) {
+    if (!Array.isArray(pair) || pair.length !== 2) throw new Error('Each disallowed pairing must contain exactly two names.');
+    const [first, second] = pair.map(indexFor);
+    if (first === second) throw new Error('A disallowed pairing must name two different participants.');
+    blocked[first].add(second);
+    blocked[second].add(first);
+  }
+  for (const [giver, recipients] of Object.entries(disallowedRecipients)) {
+    if (!Array.isArray(recipients)) throw new Error(`disallowedRecipients for ${giver} must be an array.`);
+    const giverIndex = indexFor(giver);
+    for (const recipient of recipients) blocked[giverIndex].add(indexFor(recipient));
+  }
+  return { names: clean, blocked };
 }
 
-function shuffledDerangement(count) {
-  const recipients = Array.from({ length: count }, (_, i) => i);
-  // A uniformly shuffled permutation, rejected unless it has no fixed points.
-  do {
-    for (let i = count - 1; i > 0; i--) {
-      const j = randomInt(i + 1);
-      [recipients[i], recipients[j]] = [recipients[j], recipients[i]];
+function shuffle(items) {
+  for (let i = items.length - 1; i > 0; i--) {
+    const j = randomInt(i + 1);
+    [items[i], items[j]] = [items[j], items[i]];
+  }
+  return items;
+}
+
+function drawRecipients(blocked) {
+  const count = blocked.length;
+  const giverForRecipient = Array(count).fill(-1);
+  const choices = blocked.map(exclusions => shuffle(
+    Array.from({ length: count }, (_, i) => i).filter(i => !exclusions.has(i))
+  ));
+  function assign(giver, visited) {
+    for (const recipient of choices[giver]) {
+      if (visited.has(recipient)) continue;
+      visited.add(recipient);
+      const previousGiver = giverForRecipient[recipient];
+      if (previousGiver === -1 || assign(previousGiver, visited)) {
+        giverForRecipient[recipient] = giver;
+        return true;
+      }
     }
-  } while (recipients.some((recipient, i) => recipient === i));
-  return recipients;
+    return false;
+  }
+  for (const giver of shuffle(Array.from({ length: count }, (_, i) => i))) {
+    if (!assign(giver, new Set())) {
+      throw new Error('No valid draw is possible with these exclusions. Please relax the rules and try again.');
+    }
+  }
+  const recipientForGiver = Array(count);
+  giverForRecipient.forEach((giver, recipient) => { recipientForGiver[giver] = recipient; });
+  return recipientForGiver;
 }
 
 function newCode(used) {
@@ -100,8 +153,8 @@ async function main() {
   let opts;
   try { opts = options(process.argv.slice(2)); }
   catch (error) { usage(); throw error; }
-  const names = getNames(opts);
-  const recipients = shuffledDerangement(names.length);
+  const { names, blocked } = getDrawConfig(opts);
+  const recipients = drawRecipients(blocked);
   const used = new Set();
   const codes = names.map(() => newCode(used));
   const lookupSalt = randomBytes(16);

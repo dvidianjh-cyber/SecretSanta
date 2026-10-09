@@ -1,7 +1,15 @@
-[
-  "Alice",
-  "Bob",
-  "Charlie",
-  "David",
-  "Eve"
-]
+{
+  "disallowedPairings": [
+    ["Alice", "Bob"]
+  ],
+  "disallowedRecipients": {
+    "Charlie": ["Eve"]
+  },
+  "participants": [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "David",
+    "Eve"
+  ]
+}
